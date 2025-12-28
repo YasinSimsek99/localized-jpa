@@ -33,6 +33,24 @@ Localized JPA removes this overhead completely.
 
 ---
 
+## 🧩 IntelliJ IDEA Plugin
+
+For the best development experience, install the **Localized JPA Plugin** for IntelliJ IDEA:
+
+[![IntelliJ Plugin](https://img.shields.io/badge/IntelliJ%20IDEA-Plugin-purple?logo=intellijidea)](https://github.com/YasinSimsek99/localized-jpa-plugin)
+
+The plugin provides:
+- ✅ **Full autocomplete** for generated locale-aware methods
+- ✅ **Navigation support** to jump between entity and generated translation classes
+- ✅ **No red squiggles** — IDE recognizes synthetic methods immediately
+
+> **Tip**  
+> Without the plugin, IntelliJ may show errors for generated methods until a full rebuild. The plugin eliminates this friction entirely.
+
+👉 [**Get the Plugin on GitHub**](https://github.com/YasinSimsek99/localized-jpa-plugin)
+
+---
+
 ## Installation
 
 ```xml
@@ -88,9 +106,13 @@ Product product = new Product();
 product.setName("Laptop");
 String name = product.getName();
 
-// Explicit locale
+// Explicit locale - Turkish
 product.setName("Dizüstü Bilgisayar", Locale.forLanguageTag("tr"));
 String turkishName = product.getName(Locale.forLanguageTag("tr"));
+
+// Explicit locale - German
+product.setName("Tragbarer Computer", Locale.GERMAN);
+String germanName = product.getName(Locale.GERMAN);
 ```
 
 > **Note**  
@@ -118,8 +140,6 @@ The demo project showcases:
 - Generated translation entities
 - Locale-aware getters and setters
 - Request-based language resolution using `Accept-Language`
-
-It is strongly recommended to review the demo project for real-world usage patterns and best practices.
 
 ---
 
