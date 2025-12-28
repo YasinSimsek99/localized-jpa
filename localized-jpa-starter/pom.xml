@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.localizedjpa</groupId>
+        <artifactId>localized-jpa-parent</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>localized-jpa-starter</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Localized JPA Starter</name>
+    <description>Spring Boot Starter for Localized JPA - single dependency for multi-language entity support</description>
+
+    <dependencies>
+        <!-- Annotations - required for @LocalizedEntity, @Localized -->
+        <dependency>
+            <groupId>com.localizedjpa</groupId>
+            <artifactId>localized-jpa-annotations</artifactId>
+        </dependency>
+
+        <!-- Compiler - annotation processor for code generation -->
+        <dependency>
+            <groupId>com.localizedjpa</groupId>
+            <artifactId>localized-jpa-compiler</artifactId>
+        </dependency>
+
+        <!-- Runtime - auto-configuration, specifications, base classes -->
+        <dependency>
+            <groupId>com.localizedjpa</groupId>
+            <artifactId>localized-jpa-runtime</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Skip javadoc for starter - only dependency aggregator with package-info.java -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

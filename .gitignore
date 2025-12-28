@@ -1,0 +1,61 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Java / Build
+*.class
+.gradle/
+build/
+**/build/
+out/
+bin/
+target/
+**/generated/**
+
+# Maven wrapper cache (keep wrapper JAR tracked)
+.mvn/wrapper/dists/
+.mvn/timing.properties
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.project
+.classpath
+.settings/
+.factorypath
+nbproject/
+nbproject/private/
+.nb-cache/
+.nb-gradle/
+
+# Cursor (editor) artifacts
+.cursor/
+.cursor-tmp/
+.cursor-cache/
+.cursor-history/
+cursor.log
+
+# Logs
+*.log
+hs_err_pid*
+replay_pid*
+
+# Coverage / Reports
+coverage/
+jacoco.exec
+**/reports/
+
+# Local DB files
+*.h2.db
+*.mv.db
+*.db
+
+# Env files (optional; uncomment if used)
+# .env
+# .env.local
+
+/docs

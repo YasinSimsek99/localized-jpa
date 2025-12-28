@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: localized-jpa-demo
+
+  datasource:
+    url: jdbc:h2:mem:localizedjpa;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8081
+
+# Localized JPA Configuration
+localized-jpa:
+  # Supported locales (leave empty to support all locales)
+  supported-locales:
+    - en
+    - tr
+    - de
+  # Default locale when Accept-Language header is not present
+  default-locale: tr
+  # Throw exception on unsupported locales (406 NOT ACCEPTABLE)
+  # If false, silently fallback to default-locale
+  exception-on-unsupported-languages: true
