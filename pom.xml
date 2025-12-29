@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.localizedjpa</groupId>
@@ -10,7 +10,8 @@
     <packaging>pom</packaging>
 
     <name>Localized JPA Parent</name>
-    <description>Spring Boot Starter for multi-language JPA entity support with zero boilerplate (Beta)</description>
+    <description>Spring Boot Starter for multi-language JPA entity support with zero boilerplate
+        (Beta)</description>
     <url>https://github.com/YasinSimsek99/localized-jpa</url>
 
     <properties>
@@ -62,42 +63,12 @@
         <tag>HEAD</tag>
     </scm>
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
     <modules>
         <module>localized-jpa-annotations</module>
         <module>localized-jpa-compiler</module>
         <module>localized-jpa-runtime</module>
-
         <module>localized-jpa-starter</module>
     </modules>
-
-    <profiles>
-        <!-- Default profile includes demo module -->
-        <profile>
-            <id>with-demo</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>localized-jpa-demo</module>
-            </modules>
-        </profile>
-        <!-- Profile to skip demo module for quick builds -->
-        <profile>
-            <id>skip-demo</id>
-            <modules/>
-        </profile>
-    </profiles>
 
     <dependencyManagement>
         <dependencies>
@@ -219,6 +190,17 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.9.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>false</autoPublish>
+                    <waitUntil>uploaded</waitUntil>
+                </configuration>
+            </plugin>
 
             <!-- Attach source JAR to all modules -->
             <plugin>
@@ -236,15 +218,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip> <!-- for Demo module GPG skip -->
-                </configuration>
-            </plugin>
-
-            <!-- Nexus Staging for deployment -->
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- JaCoCo for code coverage -->
@@ -286,6 +268,7 @@
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
+                            <phase>package</phase>
                             <goals>
                                 <goal>jar</goal>
                             </goals>
@@ -310,17 +293,6 @@
                             </goals>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.6.13</version>
-                    <extensions>true</extensions>
-                    <configuration>
-                        <serverId>ossrh</serverId>
-                        <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                        <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                    </configuration>
                 </plugin>
                 <!-- JaCoCo Coverage Plugin -->
                 <plugin>

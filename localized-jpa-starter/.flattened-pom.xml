@@ -37,7 +37,7 @@
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <skip>true</skip>
+          <failOnError>false</failOnError>
         </configuration>
       </plugin>
     </plugins>

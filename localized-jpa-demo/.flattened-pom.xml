@@ -18,6 +18,9 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <properties>
+    <central.publish.skip>true</central.publish.skip>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -82,6 +85,13 @@
       <plugin>
         <artifactId>maven-deploy-plugin</artifactId>
         <version>3.1.4</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
         <configuration>
           <skip>true</skip>
         </configuration>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -16,6 +16,9 @@
     <name>Localized JPA Demo</name>
     <description>Demo Spring Boot application for Localized JPA</description>
 
+    <properties>
+        <central.publish.skip>true</central.publish.skip>
+    </properties>
     <dependencies>
         <!-- Spring Boot Starter Web -->
         <dependency>
@@ -56,7 +59,8 @@
                     <parameters>true</parameters>
                     <fork>true</fork>
                     <compilerArgs>
-                        <!-- Exports and Opens for Internal Javac API Access (Required for JavacAstModifier) -->
+                        <!-- Exports and Opens for Internal Javac API Access (Required for
+                        JavacAstModifier) -->
                         <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                         <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                         <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
@@ -96,6 +100,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>3.1.4</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
