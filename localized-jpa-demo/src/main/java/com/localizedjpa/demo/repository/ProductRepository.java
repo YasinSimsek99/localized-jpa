@@ -75,4 +75,7 @@ public interface ProductRepository extends LocalizedRepository<Product, Long> {
      * Find products where localized description contains search term with pagination.
      */
     Page<Product> findByDescriptionContaining(String searchTerm, Pageable pageable);
+
+    List<Product> findByNameContaining(String keyword, Locale locale);
+
 }
