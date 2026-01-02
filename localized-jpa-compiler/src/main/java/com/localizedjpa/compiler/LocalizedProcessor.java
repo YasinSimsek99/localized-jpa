@@ -66,6 +66,11 @@ public class LocalizedProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
+        
+        // Open jdk.compiler packages early to allow AST manipulation
+        // This is the zero-config equivalent of --add-opens flags
+        Permit.openJdkCompilerPackages();
+        
         this.messager = processingEnv.getMessager();
         this.filer = processingEnv.getFiler();
         this.elementUtils = processingEnv.getElementUtils();

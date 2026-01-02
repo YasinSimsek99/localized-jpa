@@ -140,7 +140,7 @@ public class JavacAstModifier {
     private static ProcessingEnvironment tryGetField(Object instance, Class<?> clazz, String fieldName) {
         try {
             java.lang.reflect.Field field = clazz.getDeclaredField(fieldName);
-            field.setAccessible(true);
+            Permit.setAccessible(field);
             Object value = field.get(instance);
             if (value instanceof ProcessingEnvironment) {
                 return (ProcessingEnvironment) value;
@@ -166,7 +166,7 @@ public class JavacAstModifier {
             
             // IntelliJ pattern: val$delegateTo field in the handler
             java.lang.reflect.Field field = handler.getClass().getDeclaredField("val$delegateTo");
-            field.setAccessible(true);
+            Permit.setAccessible(field);
             Object value = field.get(handler);
             
             if (value instanceof ProcessingEnvironment) {
@@ -510,8 +510,12 @@ public class JavacAstModifier {
         );
         JCAnnotation mapKey = treeMaker.Annotation(mapKeyType, mapKeyArgs);
 
-        // Combine annotations
-        List<JCAnnotation> annotations = List.of(oneToMany, mapKey);
+        // Create @JsonIgnore to hide translations from JSON response
+        JCExpression jsonIgnoreType = createQualifiedName("com.fasterxml.jackson.annotation.JsonIgnore");
+        JCAnnotation jsonIgnore = treeMaker.Annotation(jsonIgnoreType, List.nil());
+
+        // Combine annotations: @OneToMany, @MapKey, @JsonIgnore
+        List<JCAnnotation> annotations = List.of(oneToMany, mapKey, jsonIgnore);
         JCModifiers modifiers = treeMaker.Modifiers(Flags.PRIVATE, annotations);
 
         return treeMaker.VarDef(

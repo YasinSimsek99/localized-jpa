@@ -153,6 +153,12 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+
+    @GetMapping("/searchByParams")
+    public List<Product> searchByParams(@RequestParam(name = "searchTerm") String searchTerm) {
+        return productService.findByName(searchTerm, LocaleContextHolder.getLocale());
+    }
+
     /**
      * Converts Product entity to DTO with localized fields.
      * Uses current locale from LocaleContextHolder (set by framework).

@@ -75,9 +75,12 @@ public class TranslationEntityGenerator {
                         .addMember("size", "$L", 25)
                         .build());
 
-        // Add parent entity reference field
+        // Add parent entity reference field with @JsonIgnore to prevent circular serialization
         ClassName parentEntityClass = ClassName.get(packageName, entityName);
+        ClassName jsonIgnoreAnnotation = ClassName.get("com.fasterxml.jackson.annotation", "JsonIgnore");
+        
         classBuilder.addField(FieldSpec.builder(parentEntityClass, "parent", Modifier.PRIVATE)
+                .addAnnotation(jsonIgnoreAnnotation)  // Prevent circular JSON serialization
                 .addAnnotation(AnnotationSpec.builder(
                         ClassName.get("jakarta.persistence", "ManyToOne"))
                         .addMember("fetch", "$T.LAZY", 

@@ -32,7 +32,7 @@ localized-jpa:
     - tr
     - de
   # Default locale when Accept-Language header is not present
-  default-locale: tr
+  default-locale: en
   # Throw exception on unsupported locales (406 NOT ACCEPTABLE)
   # If false, silently fallback to default-locale
   exception-on-unsupported-languages: true

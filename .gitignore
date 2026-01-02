@@ -12,6 +12,9 @@ bin/
 target/
 **/generated/**
 
+# Maven flatten plugin output
+.flattened-pom.xml
+
 # Maven wrapper cache (keep wrapper JAR tracked)
 .mvn/wrapper/dists/
 .mvn/timing.properties

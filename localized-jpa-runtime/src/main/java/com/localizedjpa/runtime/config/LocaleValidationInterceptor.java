@@ -33,8 +33,24 @@ public class LocaleValidationInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        // Get requested locale from Accept-Language or ?lang parameter
+        // Check if Accept-Language header is present
+        String acceptLanguageHeader = request.getHeader("Accept-Language");
+        
+        Locale localeToUse;
+        
+        if (acceptLanguageHeader == null || acceptLanguageHeader.isBlank()) {
+            // No Accept-Language header → use configured default locale
+            localeToUse = properties.getDefaultLocaleAsLocale();
+            log.debug("No Accept-Language header, using default locale: '{}'", localeToUse.getLanguage());
+            LocaleContextHolder.setLocale(localeToUse);
+            return true;
+        }
+        
+        // Get requested locale from Accept-Language header
         Locale requestedLocale = localeResolver.resolveLocale(request);
+        
+        log.debug("Accept-Language header = '{}', resolved locale = '{}'",
+            acceptLanguageHeader, requestedLocale.getLanguage());
         
         // If no supported locales configured, allow all
         List<Locale> supportedLocales = properties.getSupportedLocalesAsLocale();

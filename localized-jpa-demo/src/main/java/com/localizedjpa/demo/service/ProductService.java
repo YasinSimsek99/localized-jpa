@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -41,6 +42,13 @@ public class ProductService {
      */
     public List<Product> findByName(String name) {
         return productRepository.findByName(name);
+    }
+
+    /**
+     * Find products by exact localized name and locale param.
+     */
+    public List<Product> findByName(String name, Locale locale) {
+        return productRepository.findByName(name, locale);
     }
     
     /**

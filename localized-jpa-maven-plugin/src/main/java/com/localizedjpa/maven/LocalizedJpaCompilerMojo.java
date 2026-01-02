@@ -100,6 +100,12 @@ public class LocalizedJpaCompilerMojo extends AbstractMojo {
     @Parameter(property = "localizedjpa.skip", defaultValue = "false")
     private boolean skip;
 
+    /**
+     * Lombok version. Set to empty string to disable Lombok support.
+     */
+    @Parameter(property = "lombok.version", defaultValue = "1.18.30")
+    private String lombokVersion;
+
     @Override
     public void execute() throws MojoExecutionException {
         if (skip) {
@@ -119,7 +125,7 @@ public class LocalizedJpaCompilerMojo extends AbstractMojo {
 
     private void executeCompilerPlugin() throws MojoExecutionException {
         Element[] compilerArgs = buildCompilerArguments();
-        Element processorPath = buildAnnotationProcessorPath();
+        Element[] processorPaths = buildAnnotationProcessorPaths();
 
         executeMojo(
             plugin(
@@ -132,7 +138,7 @@ public class LocalizedJpaCompilerMojo extends AbstractMojo {
                 element("source", sourceVersion),
                 element("target", targetVersion),
                 element("fork", "true"),
-                element("annotationProcessorPaths", processorPath),
+                element("annotationProcessorPaths", processorPaths),
                 element("compilerArgs", compilerArgs)
             ),
             executionEnvironment(project, session, pluginManager)
@@ -154,11 +160,28 @@ public class LocalizedJpaCompilerMojo extends AbstractMojo {
         return args;
     }
 
-    private Element buildAnnotationProcessorPath() {
-        return element("path",
-            element("groupId", "com.localizedjpa"),
-            element("artifactId", "localized-jpa-compiler"),
-            element("version", processorVersion)
-        );
+    private Element[] buildAnnotationProcessorPaths() {
+        if (lombokVersion != null && !lombokVersion.isEmpty()) {
+            return new Element[] {
+                element("path",
+                    element("groupId", "com.localizedjpa"),
+                    element("artifactId", "localized-jpa-compiler"),
+                    element("version", processorVersion)
+                ),
+                element("path",
+                    element("groupId", "org.projectlombok"),
+                    element("artifactId", "lombok"),
+                    element("version", lombokVersion)
+                )
+            };
+        } else {
+            return new Element[] {
+                element("path",
+                    element("groupId", "com.localizedjpa"),
+                    element("artifactId", "localized-jpa-compiler"),
+                    element("version", processorVersion)
+                )
+            };
+        }
     }
 }

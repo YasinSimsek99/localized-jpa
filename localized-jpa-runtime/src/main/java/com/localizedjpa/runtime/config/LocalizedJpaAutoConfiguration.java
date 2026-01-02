@@ -15,6 +15,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
+import java.util.List;
+import java.util.Locale;
+
 /**
  * Auto-configuration for localized JPA support.
  * 
@@ -51,12 +54,29 @@ public class LocalizedJpaAutoConfiguration implements WebMvcConfigurer {
     
     @PostConstruct
     public void init() {
-        String supportedLocales = properties.getSupportedLocales().isEmpty() 
+        List<String> supportedLocales = properties.getSupportedLocales();
+        String defaultLocale = properties.getDefaultLocale();
+        
+        // Validate: if supported-locales is configured, default-locale must be in the list
+        if (!supportedLocales.isEmpty()) {
+            boolean defaultIsSupported = supportedLocales.stream()
+                .anyMatch(locale -> locale.equalsIgnoreCase(defaultLocale));
+            
+            if (!defaultIsSupported) {
+                throw new IllegalStateException(
+                    String.format("LocalizedJPA Configuration Error: default-locale '%s' is not in supported-locales %s. " +
+                        "Either add '%s' to supported-locales or change default-locale to one of %s.",
+                        defaultLocale, supportedLocales, defaultLocale, supportedLocales)
+                );
+            }
+        }
+        
+        String supportedLocalesStr = supportedLocales.isEmpty() 
             ? "all locales (validation disabled)" 
-            : String.join(", ", properties.getSupportedLocales());
+            : String.join(", ", supportedLocales);
         
         log.info("Localized JPA initialized with default locale '{}' and supported locales: {}", 
-            properties.getDefaultLocale(), supportedLocales);
+            defaultLocale, supportedLocalesStr);
     }
 
     /**
@@ -69,7 +89,12 @@ public class LocalizedJpaAutoConfiguration implements WebMvcConfigurer {
     @ConditionalOnMissingBean(LocaleResolver.class)
     public LocaleResolver localeResolver() {
         AcceptHeaderLocaleResolver resolver = new AcceptHeaderLocaleResolver();
-        resolver.setDefaultLocale(properties.getDefaultLocaleAsLocale());
+        
+        Locale defaultLocale = properties.getDefaultLocaleAsLocale();
+        log.debug("LocaleResolver configured with default locale: '{}' (from config: '{}')",
+            defaultLocale.getLanguage(), properties.getDefaultLocale());
+        
+        resolver.setDefaultLocale(defaultLocale);
         
         // Note: We don't set supported locales here because validation
         // is done in LocaleValidationInterceptor for better control
