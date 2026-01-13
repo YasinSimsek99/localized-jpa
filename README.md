@@ -1,8 +1,8 @@
 # Localized JPA
 
-[![Maven Central](https://img.shields.io/badge/Maven%20Central-0.1.2-blue)](https://central.sonatype.com/artifact/com.localizedjpa/localized-jpa-starter)
+[![Maven Central](https://img.shields.io/badge/Maven%20Central-0.1.3-blue)](https://central.sonatype.com/artifact/com.localizedjpa/localized-jpa-starter)
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.org/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0-green)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-green)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
 
 Multi-language JPA entity support with compile-time code generation for Spring Boot applications.
@@ -13,7 +13,7 @@ Multi-language JPA entity support with compile-time code generation for Spring B
 <dependency>
     <groupId>com.localizedjpa</groupId>
     <artifactId>localized-jpa-starter</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.3</version>
 </dependency>
 ```
 
@@ -45,11 +45,22 @@ public class Product {
     private String name;
 
     @Localized
+    @Localized
+    @Column(length = 2000, nullable = false)
+    @NotNull
     private String description;
+
+    @Localized
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    private String content;
 
     private Double price;
 }
 ```
+
+> **Note:** Supported constraints (`@Column`, `@NotNull`, etc.) are automatically propagated to the translation entity.
+
 
 ### 2. Use Generated Methods
 

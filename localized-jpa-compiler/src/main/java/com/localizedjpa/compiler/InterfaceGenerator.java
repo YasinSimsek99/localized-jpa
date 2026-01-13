@@ -109,8 +109,24 @@ public class InterfaceGenerator {
     }
 
     /**
+     * Record holding information about the @Column annotation.
+     */
+    public record ColumnInfo(Integer length, Integer precision, Integer scale, 
+                           Boolean nullable, Boolean unique, String columnDefinition) {
+        public static ColumnInfo empty() {
+            return new ColumnInfo(null, null, null, null, null, null);
+        }
+    }
+
+    /**
      * Record holding information about a localized field.
      */
-    public record LocalizedFieldInfo(String name, TypeName typeName, boolean fallback) {
+    public record LocalizedFieldInfo(String name, TypeName typeName, boolean fallback, 
+                                   ColumnInfo columnInfo, List<AnnotationSpec> additionalAnnotations) {
+        
+        // Compact constructor for backward compatibility during refactoring
+        public LocalizedFieldInfo(String name, TypeName typeName, boolean fallback) {
+            this(name, typeName, fallback, ColumnInfo.empty(), List.of());
+        }
     }
 }

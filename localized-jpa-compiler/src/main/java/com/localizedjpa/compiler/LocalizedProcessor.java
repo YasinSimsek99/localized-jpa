@@ -62,6 +62,30 @@ public class LocalizedProcessor extends AbstractProcessor {
         String className,
         List<LocalizedFieldInfo> fields
     ) {}
+    
+    // Supported annotations to propagate
+    private static final Set<String> PROPAGATED_ANNOTATIONS = Set.of(
+        "jakarta.persistence.Lob",
+        "javax.persistence.Lob",
+        "jakarta.persistence.Basic",
+        "javax.persistence.Basic",
+        "jakarta.validation.constraints.NotNull",
+        "javax.validation.constraints.NotNull",
+        "jakarta.validation.constraints.Size",
+        "javax.validation.constraints.Size",
+        "jakarta.validation.constraints.Pattern",
+        "javax.validation.constraints.Pattern",
+        "jakarta.validation.constraints.Email",
+        "javax.validation.constraints.Email",
+        "jakarta.validation.constraints.Min",
+        "javax.validation.constraints.Min",
+        "jakarta.validation.constraints.Max",
+        "javax.validation.constraints.Max",
+        "jakarta.validation.constraints.NotEmpty",
+        "javax.validation.constraints.NotEmpty",
+        "jakarta.validation.constraints.NotBlank",
+        "javax.validation.constraints.NotBlank"
+    );
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -193,7 +217,58 @@ public class LocalizedProcessor extends AbstractProcessor {
         TypeMirror typeMirror = field.asType();
         TypeName typeName = TypeName.get(typeMirror);
         boolean fallback = localizedAnnotation.fallback();
-        return new LocalizedFieldInfo(fieldName, typeName, fallback);
+        
+        // Extract column info and additional annotations
+        InterfaceGenerator.ColumnInfo columnInfo = extractColumnInfo(field);
+        List<com.squareup.javapoet.AnnotationSpec> additionalAnnotations = extractAdditionalAnnotations(field);
+        
+        return new LocalizedFieldInfo(fieldName, typeName, fallback, columnInfo, additionalAnnotations);
+    }
+    
+    private InterfaceGenerator.ColumnInfo extractColumnInfo(VariableElement field) {
+        for (AnnotationMirror mirror : field.getAnnotationMirrors()) {
+            String annotName = mirror.getAnnotationType().toString();
+            if (annotName.equals("jakarta.persistence.Column") || 
+                annotName.equals("javax.persistence.Column")) {
+                
+                Integer length = null;
+                Integer precision = null;
+                Integer scale = null;
+                Boolean nullable = null;
+                Boolean unique = null;
+                String columnDefinition = null;
+
+                for (var entry : mirror.getElementValues().entrySet()) {
+                    String paramName = entry.getKey().getSimpleName().toString();
+                    Object value = entry.getValue().getValue();
+                    
+                    switch (paramName) {
+                        case "length" -> length = (Integer) value;
+                        case "precision" -> precision = (Integer) value;
+                        case "scale" -> scale = (Integer) value;
+                        case "nullable" -> nullable = (Boolean) value;
+                        case "unique" -> unique = (Boolean) value;
+                        case "columnDefinition" -> columnDefinition = (String) value;
+                    }
+                }
+                
+                return new InterfaceGenerator.ColumnInfo(length, precision, scale, nullable, unique, columnDefinition);
+            }
+        }
+        return InterfaceGenerator.ColumnInfo.empty();
+    }
+    
+    private List<com.squareup.javapoet.AnnotationSpec> extractAdditionalAnnotations(VariableElement field) {
+        List<com.squareup.javapoet.AnnotationSpec> specs = new ArrayList<>();
+        
+        for (AnnotationMirror mirror : field.getAnnotationMirrors()) {
+            String annotName = mirror.getAnnotationType().toString();
+            if (PROPAGATED_ANNOTATIONS.contains(annotName)) {
+                specs.add(com.squareup.javapoet.AnnotationSpec.get(mirror));
+            }
+        }
+        
+        return specs;
     }
 
     private void processLocalizedEntity(TypeElement classElement, List<LocalizedFieldInfo> localizedFields) {
@@ -247,8 +322,12 @@ public class LocalizedProcessor extends AbstractProcessor {
                     TypeMirror typeMirror = field.asType();
                     TypeName typeName = TypeName.get(typeMirror);
                     boolean fallback = localizedAnnotation.fallback();
+                    
+                    // Extract info manually since we can't use helper method easily in this context loop
+                    InterfaceGenerator.ColumnInfo columnInfo = extractColumnInfo(field);
+                    List<com.squareup.javapoet.AnnotationSpec> additionalAnnotations = extractAdditionalAnnotations(field);
 
-                    fields.add(new LocalizedFieldInfo(fieldName, typeName, fallback));
+                    fields.add(new LocalizedFieldInfo(fieldName, typeName, fallback, columnInfo, additionalAnnotations));
                     
                     messager.printMessage(Diagnostic.Kind.NOTE, 
                         "[LocalizedJPA]   Found @Localized field: " + fieldName);

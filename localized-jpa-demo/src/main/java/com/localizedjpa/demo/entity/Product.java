@@ -2,6 +2,7 @@ package com.localizedjpa.demo.entity;
 
 import com.localizedjpa.annotations.Localized;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,6 +35,8 @@ public class Product {
     private String name;
 
     @Localized(fallback = false)
+    @Column(length = 2000)
+    @NotNull
     private String description;
 
     @Column(name = "price")

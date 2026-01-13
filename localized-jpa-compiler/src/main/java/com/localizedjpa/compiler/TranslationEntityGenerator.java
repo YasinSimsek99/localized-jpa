@@ -128,12 +128,31 @@ public class TranslationEntityGenerator {
         String capitalizedName = capitalize(fieldName);
         String columnName = toSnakeCase(fieldName);
 
-        // Field with @Column annotation
-        classBuilder.addField(FieldSpec.builder(fieldType, fieldName, Modifier.PRIVATE)
-                .addAnnotation(AnnotationSpec.builder(COLUMN_ANNOTATION)
-                        .addMember("name", "$S", columnName)
-                        .build())
-                .build());
+        // Build @Column annotation
+        AnnotationSpec.Builder columnBuilder = AnnotationSpec.builder(COLUMN_ANNOTATION)
+                .addMember("name", "$S", columnName);
+        
+        // Add column properties from original field if present
+        InterfaceGenerator.ColumnInfo columnInfo = field.columnInfo();
+        if (columnInfo.length() != null) columnBuilder.addMember("length", "$L", columnInfo.length());
+        if (columnInfo.precision() != null) columnBuilder.addMember("precision", "$L", columnInfo.precision());
+        if (columnInfo.scale() != null) columnBuilder.addMember("scale", "$L", columnInfo.scale());
+        if (columnInfo.nullable() != null) columnBuilder.addMember("nullable", "$L", columnInfo.nullable());
+        if (columnInfo.unique() != null) columnBuilder.addMember("unique", "$L", columnInfo.unique());
+        if (columnInfo.columnDefinition() != null) columnBuilder.addMember("columnDefinition", "$S", columnInfo.columnDefinition());
+
+        FieldSpec.Builder fieldBuilder = FieldSpec.builder(fieldType, fieldName, Modifier.PRIVATE)
+                .addAnnotation(columnBuilder.build());
+
+        // Add propagation annotations (like @Lob, @Basic, Validation)
+        if (field.additionalAnnotations() != null) {
+            for (AnnotationSpec annotation : field.additionalAnnotations()) {
+                fieldBuilder.addAnnotation(annotation);
+            }
+        }
+
+        // Add field to class
+        classBuilder.addField(fieldBuilder.build());
 
         // Getter
         classBuilder.addMethod(MethodSpec.methodBuilder("get" + capitalizedName)

@@ -5,7 +5,19 @@ All notable changes to LocalizedJPA will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.2] - 2026-01-03
+
+## [0.1.3] - 2026-01-13
+
+### Added
+
+- **Annotation Propagation**: Now propagates JPA column definitions (e.g., `@Column(length=...)`) and Validation annotations (e.g., `@NotNull`, `@Size`) from the `@Localized` field to the generated Translation entity fields. This allows for precise database schema control and validation.
+- **Spring Boot 3.x Compatibility**: Verified and documented native compatibility with Spring Boot 3.x (and 4.x) thanks to `jakarta.persistence` usage.
+
+### Fixed
+
+- **Maven Reactor Issue**: Fixed module parent referencing to ensure correct build order and reactor composition.
+
+---
 
 ### Added
 
