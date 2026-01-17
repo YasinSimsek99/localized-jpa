@@ -13,6 +13,13 @@ For IDE support (autocomplete, no red squiggles), install the companion plugin:
 
 [![IntelliJ Plugin](https://img.shields.io/badge/IntelliJ%20IDEA-Plugin-purple?logo=intellijidea)](https://github.com/YasinSimsek99/localized-jpa-plugin)
 
+---
+
+**🚀 [Install from JetBrains Marketplace](https://plugins.jetbrains.com/plugin/29551-localizedjpa)**
+
+---
+
+
 ## Installation
 
 ```xml
