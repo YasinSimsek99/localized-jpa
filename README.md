@@ -7,6 +7,12 @@
 
 Multi-language JPA entity support with compile-time code generation for Spring Boot applications.
 
+## IntelliJ IDEA Plugin
+
+For IDE support (autocomplete, no red squiggles), install the companion plugin:
+
+[![IntelliJ Plugin](https://img.shields.io/badge/IntelliJ%20IDEA-Plugin-purple?logo=intellijidea)](https://github.com/YasinSimsek99/localized-jpa-plugin)
+
 ## Installation
 
 ```xml
@@ -130,17 +136,6 @@ Locale is resolved automatically from HTTP request:
 Accept-Language: tr
 ```
 
-Or via query parameter:
-
-```
-GET /products?lang=tr
-```
-
-## IntelliJ IDEA Plugin
-
-For IDE support (autocomplete, no red squiggles), install the companion plugin:
-
-[![IntelliJ Plugin](https://img.shields.io/badge/IntelliJ%20IDEA-Plugin-purple?logo=intellijidea)](https://github.com/YasinSimsek99/localized-jpa-plugin)
 
 ## Demo Project
 
