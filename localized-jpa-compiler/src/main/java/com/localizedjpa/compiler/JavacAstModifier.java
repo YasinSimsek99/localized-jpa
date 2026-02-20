@@ -338,6 +338,77 @@ public class JavacAstModifier {
 
 
     /**
+     * Removes validation annotations from a localized field.
+     * This prevents Hibernate from throwing ConstraintViolationException during persist.
+     */
+    public void removeValidationAnnotations(TypeElement classElement, String fieldName) {
+        JCTree tree = (JCTree) trees.getTree(classElement);
+        if (!(tree instanceof JCClassDecl classDecl)) {
+            return;
+        }
+
+        for (JCTree member : classDecl.defs) {
+            if (member instanceof JCVariableDecl fieldDecl) {
+                if (fieldDecl.name.toString().equals(fieldName)) {
+                    List<JCAnnotation> newAnnotations = List.nil();
+                    boolean removed = false;
+                    
+                    for (JCAnnotation annotation : fieldDecl.mods.annotations) {
+                        String annotationName = annotation.annotationType.toString();
+                        if (!isValidationAnnotation(annotationName)) {
+                            newAnnotations = newAnnotations.append(annotation);
+                        } else {
+                            removed = true;
+                            processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE,
+                                    "[LocalizedJPA] Removed validation annotation @" + annotationName + " from field: " + fieldName);
+                        }
+                    }
+
+                    if (removed) {
+                        fieldDecl.mods.annotations = newAnnotations;
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+    private boolean isValidationAnnotation(String annotationName) {
+        String name = annotationName;
+        // Strip package if present
+        int lastDot = name.lastIndexOf('.');
+        if (lastDot != -1) {
+            // Check if it's from javax.validation or jakarta.validation
+            if (!name.startsWith("javax.validation.constraints.") && !name.startsWith("jakarta.validation.constraints.")) {
+                return false;
+            }
+            name = name.substring(lastDot + 1);
+        }
+        
+        return name.equals("NotNull") ||
+               name.equals("NotEmpty") ||
+               name.equals("NotBlank") ||
+               name.equals("Size") ||
+               name.equals("Null") ||
+               name.equals("Pattern") ||
+               name.equals("Email") ||
+               name.equals("Min") ||
+               name.equals("Max") ||
+               name.equals("DecimalMin") ||
+               name.equals("DecimalMax") ||
+               name.equals("Positive") ||
+               name.equals("PositiveOrZero") ||
+               name.equals("Negative") ||
+               name.equals("NegativeOrZero") ||
+               name.equals("Future") ||
+               name.equals("FutureOrPresent") ||
+               name.equals("Past") ||
+               name.equals("PastOrPresent") ||
+               name.equals("AssertTrue") ||
+               name.equals("AssertFalse");
+    }
+
+    /**
      * Injects the translations map field into the class.
      */
     public void injectTranslationsField(TypeElement classElement, String translationClassName) {

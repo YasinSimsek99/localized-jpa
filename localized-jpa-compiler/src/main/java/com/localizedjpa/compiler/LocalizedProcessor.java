@@ -355,8 +355,8 @@ public class LocalizedProcessor extends AbstractProcessor {
         // Generate translation entity
         try {
             TranslationEntityGenerator translationGenerator = new TranslationEntityGenerator(filer);
-            String tableName = getTableName(classElement, className);
-            translationGenerator.generateTranslationEntity(packageName, className, tableName, localizedFields);
+            TableInfo tableInfo = getTableInfo(classElement, className);
+            translationGenerator.generateTranslationEntity(packageName, className, tableInfo, localizedFields);
             
             messager.printMessage(Diagnostic.Kind.NOTE, 
                 "[LocalizedJPA] Generated translation entity: " + packageName + "." + className + "Translation");
@@ -382,9 +382,10 @@ public class LocalizedProcessor extends AbstractProcessor {
             // Ensure @Transient is imported
             astModifier.ensureTransientImport(classElement);
             
-            // Mark localized fields as @Transient
+            // Mark localized fields as @Transient and remove validation annotations
             for (LocalizedFieldInfo field : localizedFields) {
                 astModifier.markFieldAsTransient(classElement, field.name());
+                astModifier.removeValidationAnnotations(classElement, field.name());
             }
             
             // Inject translations map field
@@ -427,21 +428,29 @@ public class LocalizedProcessor extends AbstractProcessor {
         pendingInjections.clear();
     }
 
-    private String getTableName(TypeElement classElement, String className) {
+    private TableInfo getTableInfo(TypeElement classElement, String className) {
+        String name = StringUtils.toSnakeCase(className);
+        String schema = "";
+        String catalog = "";
         for (AnnotationMirror annotation : classElement.getAnnotationMirrors()) {
             String annotationName = annotation.getAnnotationType().toString();
-            if (annotationName.equals("jakarta.persistence.Table") || 
+            if (annotationName.equals("jakarta.persistence.Table") ||
                 annotationName.equals("javax.persistence.Table")) {
                 for (var entry : annotation.getElementValues().entrySet()) {
-                    if (entry.getKey().getSimpleName().toString().equals("name")) {
-                        String value = entry.getValue().getValue().toString();
-                        if (!value.isEmpty()) {
-                            return value;
-                        }
+                    String paramName = entry.getKey().getSimpleName().toString();
+                    Object value = entry.getValue().getValue();
+                    if (value == null) continue;
+                    String str = value.toString();
+                    switch (paramName) {
+                        case "name" -> { if (!str.isEmpty()) name = str; }
+                        case "schema" -> { if (!str.isEmpty()) schema = str; }
+                        case "catalog" -> { if (!str.isEmpty()) catalog = str; }
+                        default -> { }
                     }
                 }
+                break;
             }
         }
-        return StringUtils.toSnakeCase(className);
+        return TableInfo.of(name, schema, catalog);
     }
 }

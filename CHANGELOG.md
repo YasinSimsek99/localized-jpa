@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [0.1.4] - 2026-02-21
+
+### Added
+
+- **AST Validation Cleanup**: Solved `ConstraintViolationException` that occurred during `persist`. The annotation processor now removes `jakarta.validation` and `javax.validation` annotations (e.g., `@NotNull`, `@Size`) from the base entity via AST manipulation at compile time, while safely propagating them to the generated `Translation` entity.
+- **Schema & Catalog Propagation**: Automatically propagates `schema` and `catalog` attributes from the base entity's `@Table` annotation to the generated translation table.
+- **README Updates**: Added detailed explanations for the `default-locale` configuration and locale fallback mechanism.
+
+### Changed
+
+- Version bumped to `0.1.4` preparing for public repository deployment.
+
+---
+
 ## [0.1.3] - 2026-01-13
 
 ### Added
@@ -84,10 +98,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | 0.1.0   | ❌          | ❌             | ❌                | ❌           |
 | 0.1.1   | ❌          | ❌             | ❌                | ❌           |
 | 0.1.2   | ✅          | ✅             | ✅                | ✅           |
+| 0.1.3   | ✅          | ✅             | ✅                | ✅           |
+| 0.1.4   | ✅          | ✅             | ✅                | ✅           |
 
 ---
 
 ## Upgrade Guide
+
+### From 0.1.3 to 0.1.4
+
+No breaking changes. Simply update the version in your `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>com.localizedjpa</groupId>
+    <artifactId>localized-jpa-starter</artifactId>
+    <version>0.1.4</version>
+</dependency>
+```
+
+**Benefits of upgrading:**
+- Fixes `ConstraintViolationException` when using `@NotNull`, `@NotBlank`, etc., on `@Localized` fields.
+- Full support for database schemas and catalogs.
+
+---
 
 ### From 0.1.1 to 0.1.2
 

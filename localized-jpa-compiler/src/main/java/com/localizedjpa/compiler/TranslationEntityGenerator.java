@@ -49,25 +49,32 @@ public class TranslationEntityGenerator {
      *
      * @param packageName Package name of the entity
      * @param entityName Simple name of the entity class
-     * @param tableName Name of the main entity table (for generating translation table name)
+     * @param tableInfo Table metadata from entity @Table (name, schema, catalog)
      * @param localizedFields List of localized field info
      * @throws IOException If file cannot be written
      */
-    public void generateTranslationEntity(String packageName, String entityName, 
-                                           String tableName,
-                                           List<InterfaceGenerator.LocalizedFieldInfo> localizedFields) 
+    public void generateTranslationEntity(String packageName, String entityName,
+                                           TableInfo tableInfo,
+                                           List<InterfaceGenerator.LocalizedFieldInfo> localizedFields)
                                            throws IOException {
-        
+
         String translationClassName = entityName + "Translation";
-        String translationTableName = tableName + "_translations";
+        String translationTableName = tableInfo.name() + "_translations";
+
+        AnnotationSpec.Builder tableBuilder = AnnotationSpec.builder(TABLE_ANNOTATION)
+                .addMember("name", "$S", translationTableName);
+        if (tableInfo.schema() != null && !tableInfo.schema().isEmpty()) {
+            tableBuilder.addMember("schema", "$S", tableInfo.schema());
+        }
+        if (tableInfo.catalog() != null && !tableInfo.catalog().isEmpty()) {
+            tableBuilder.addMember("catalog", "$S", tableInfo.catalog());
+        }
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(translationClassName)
                 .addModifiers(Modifier.PUBLIC)
                 .superclass(BASE_TRANSLATION)
                 .addAnnotation(ENTITY_ANNOTATION)
-                .addAnnotation(AnnotationSpec.builder(TABLE_ANNOTATION)
-                        .addMember("name", "$S", translationTableName)
-                        .build())
+                .addAnnotation(tableBuilder.build())
                 .addJavadoc("Generated translation entity for {@code $L}.\n", entityName)
                 .addJavadoc("\n<p>This entity stores localized field values for each locale.\n")
                 .addJavadoc("Table: {@code $L}\n", translationTableName)

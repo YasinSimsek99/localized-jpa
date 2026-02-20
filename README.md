@@ -1,6 +1,6 @@
 # Localized JPA
 
-[![Maven Central](https://img.shields.io/badge/Maven%20Central-0.1.3-blue)](https://central.sonatype.com/artifact/com.localizedjpa/localized-jpa-starter)
+[![Maven Central](https://img.shields.io/badge/Maven%20Central-0.1.4-blue)](https://central.sonatype.com/artifact/com.localizedjpa/localized-jpa-starter)
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-green)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
@@ -20,7 +20,7 @@ For IDE support (autocomplete, no red squiggles), install the companion plugin:
 <dependency>
     <groupId>com.localizedjpa</groupId>
     <artifactId>localized-jpa-starter</artifactId>
-    <version>0.1.3</version>
+    <version>0.1.4</version>
 </dependency>
 ```
 
@@ -32,8 +32,8 @@ localized-jpa:
     - en
     - tr
     - de
-  default-locale: en
-  exception-on-unsupported-languages: true  # 406 for unsupported locales
+  default-locale: en # Used as fallback when Accept-Language header is missing or unsupported
+  exception-on-unsupported-languages: true  # If true: throws 406. If false: falls back to default-locale
 ```
 
 ## Usage
@@ -42,6 +42,7 @@ localized-jpa:
 
 ```java
 @Entity
+@Table(name = "product", schema = "inventory")
 public class Product {
 
     @Id
@@ -66,7 +67,7 @@ public class Product {
 }
 ```
 
-> **Note:** Supported constraints (`@Column`, `@NotNull`, etc.) are automatically propagated to the translation entity.
+> **Note:** Supported constraints (`@Column`, `@NotNull`, etc.) are automatically propagated to the translation entity. Furthermore, any Java Validation API constraints (like `@NotNull`, `@Size`) are safely removed from the base entity during compilation to prevent `ConstraintViolationException` during persist. The `schema` and `catalog` attributes from `@Table` are also automatically correctly applied to the generated translation table.
 
 
 ### 2. Use Generated Methods
@@ -131,12 +132,17 @@ The annotation processor generates:
 
 ## Locale Resolution
 
-Locale is resolved automatically from HTTP request:
+Locale is resolved automatically from the HTTP request using the `Accept-Language` header:
 
-```
+```http
 Accept-Language: tr
 ```
 
+### Fallback Mechanism:
+- **Missing Header:** If the request does not specify an `Accept-Language` header, the system automatically uses the configured `default-locale`.
+- **Unsupported Locale:** If a client requests a locale that is not listed in `supported-locales` (e.g., `Accept-Language: fr`):
+  - If `exception-on-unsupported-languages` is `true`, a `406 Not Acceptable` error is thrown.
+  - If it is `false`, the system silently falls back to the `default-locale`.
 
 ## Demo Project
 
