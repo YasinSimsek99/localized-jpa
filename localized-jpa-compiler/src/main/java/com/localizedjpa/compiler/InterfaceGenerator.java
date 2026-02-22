@@ -111,10 +111,10 @@ public class InterfaceGenerator {
     /**
      * Record holding information about the @Column annotation.
      */
-    public record ColumnInfo(Integer length, Integer precision, Integer scale, 
+    public record ColumnInfo(String name, Integer length, Integer precision, Integer scale, 
                            Boolean nullable, Boolean unique, String columnDefinition) {
         public static ColumnInfo empty() {
-            return new ColumnInfo(null, null, null, null, null, null);
+            return new ColumnInfo(null, null, null, null, null, null, null);
         }
     }
 

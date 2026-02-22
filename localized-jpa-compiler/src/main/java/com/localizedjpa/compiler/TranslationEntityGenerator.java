@@ -133,14 +133,15 @@ public class TranslationEntityGenerator {
         String fieldName = field.name();
         TypeName fieldType = field.typeName();
         String capitalizedName = capitalize(fieldName);
-        String columnName = toSnakeCase(fieldName);
+        // Determine column name: use explicit name if provided, else fallback to snake_case
+        InterfaceGenerator.ColumnInfo columnInfo = field.columnInfo();
+        String columnName = (columnInfo.name() != null && !columnInfo.name().trim().isEmpty()) 
+                ? columnInfo.name() 
+                : toSnakeCase(fieldName);
 
         // Build @Column annotation
         AnnotationSpec.Builder columnBuilder = AnnotationSpec.builder(COLUMN_ANNOTATION)
                 .addMember("name", "$S", columnName);
-        
-        // Add column properties from original field if present
-        InterfaceGenerator.ColumnInfo columnInfo = field.columnInfo();
         if (columnInfo.length() != null) columnBuilder.addMember("length", "$L", columnInfo.length());
         if (columnInfo.precision() != null) columnBuilder.addMember("precision", "$L", columnInfo.precision());
         if (columnInfo.scale() != null) columnBuilder.addMember("scale", "$L", columnInfo.scale());

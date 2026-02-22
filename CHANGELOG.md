@@ -6,8 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [0.1.4] - 2026-02-21
+## [0.1.5] - 2026-02-23
 
+### Added
+
+- **Explicit `@Column(name)` Customization**: Added full support for customizing the generated database column names of `@Localized` fields. When `@Column(name = "custom_field_name")` is explicitly provided on a base entity's field, the annotation processor now strictly respects this name in the Translation entity instead of defaulting to the snake_case conversion of the Java field name.
+
+### Changed
+
+- **Smarter Snake Case Conversion**: Rewrote the internal `StringUtils.toSnakeCase(String)` method using an advanced Regex. It now handles consecutive uppercase abbreviations (e.g., `userID2Profile` -> `user_id2_profile` instead of `user_i_d2_profile`) and properly respects `Locale.ROOT` formatting to prevent Turkish standard locale bugs (like `I` to `ı`).
+
+---
+
+## [0.1.4] - 2026-02-21
 ### Added
 
 - **AST Validation Cleanup**: Solved `ConstraintViolationException` that occurred during `persist`. The annotation processor now removes `jakarta.validation` and `javax.validation` annotations (e.g., `@NotNull`, `@Size`) from the base entity via AST manipulation at compile time, while safely propagating them to the generated `Translation` entity.
@@ -93,17 +104,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version Comparison
 
-| Version | Zero-Config | Startup Banner | Config Validation | Lazy Caching |
-|---------|-------------|----------------|-------------------|--------------|
-| 0.1.0   | ❌          | ❌             | ❌                | ❌           |
-| 0.1.1   | ❌          | ❌             | ❌                | ❌           |
-| 0.1.2   | ✅          | ✅             | ✅                | ✅           |
-| 0.1.3   | ✅          | ✅             | ✅                | ✅           |
-| 0.1.4   | ✅          | ✅             | ✅                | ✅           |
+| Version | Zero-Config | Startup Banner | Config Validation | Lazy Caching | Explicit `@Column(name)` |
+|---------|-------------|----------------|-------------------|--------------|--------------------------|
+| 0.1.0   | ❌          | ❌             | ❌                | ❌           | ❌                       |
+| 0.1.1   | ❌          | ❌             | ❌                | ❌           | ❌                       |
+| 0.1.2   | ✅          | ✅             | ✅                | ✅           | ❌                       |
+| 0.1.3   | ✅          | ✅             | ✅                | ✅           | ❌                       |
+| 0.1.4   | ✅          | ✅             | ✅                | ✅           | ❌                       |
+| 0.1.5   | ✅          | ✅             | ✅                | ✅           | ✅                       |
 
 ---
 
 ## Upgrade Guide
+
+### From 0.1.4 to 0.1.5
+
+No breaking changes. Simply update the version in your `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>com.localizedjpa</groupId>
+    <artifactId>localized-jpa-starter</artifactId>
+    <version>0.1.5</version>
+</dependency>
+```
+
+**Benefits of upgrading:**
+- Ability to override auto-generated column names using `@Column(name = "your_name")`.
+- Smart handling of abbreviations (like `URL`, `ID`, `XML`) during DB schema generation.
+
+---
 
 ### From 0.1.3 to 0.1.4
 

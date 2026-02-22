@@ -1,6 +1,6 @@
 # Localized JPA
 
-[![Maven Central](https://img.shields.io/badge/Maven%20Central-0.1.4-blue)](https://central.sonatype.com/artifact/com.localizedjpa/localized-jpa-starter)
+[![Maven Central](https://img.shields.io/badge/Maven%20Central-0.1.5-blue)](https://central.sonatype.com/artifact/com.localizedjpa/localized-jpa-starter)
 [![Java](https://img.shields.io/badge/Java-17%2B-orange)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-green)](https://spring.io/projects/spring-boot)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue)](LICENSE)
@@ -20,7 +20,7 @@ For IDE support (autocomplete, no red squiggles), install the companion plugin:
 <dependency>
     <groupId>com.localizedjpa</groupId>
     <artifactId>localized-jpa-starter</artifactId>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
 </dependency>
 ```
 
@@ -59,6 +59,7 @@ public class Product {
     private String description;
 
     @Localized
+    @Column(name = "custom_content", length = 5000)
     @Lob
     @Basic(fetch = FetchType.LAZY)
     private String content;
@@ -67,7 +68,7 @@ public class Product {
 }
 ```
 
-> **Note:** Supported constraints (`@Column`, `@NotNull`, etc.) are automatically propagated to the translation entity. Furthermore, any Java Validation API constraints (like `@NotNull`, `@Size`) are safely removed from the base entity during compilation to prevent `ConstraintViolationException` during persist. The `schema` and `catalog` attributes from `@Table` are also automatically correctly applied to the generated translation table.
+> **Note:** Supported constraints (`@Column`, `@NotNull`, etc.) are automatically propagated to the translation entity. If you provide an explicit `name` in `@Column(name = "my_name")`, the generator will strictly use your provided name instead of auto-generating a snake_case column. Furthermore, any Java Validation API constraints (like `@NotNull`, `@Size`) are safely removed from the base entity during compilation to prevent `ConstraintViolationException` during persist. The `schema` and `catalog` attributes from `@Table` are also automatically correctly applied to the generated translation table.
 
 
 ### 2. Use Generated Methods

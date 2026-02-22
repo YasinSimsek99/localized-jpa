@@ -231,6 +231,7 @@ public class LocalizedProcessor extends AbstractProcessor {
             if (annotName.equals("jakarta.persistence.Column") || 
                 annotName.equals("javax.persistence.Column")) {
                 
+                String name = null;
                 Integer length = null;
                 Integer precision = null;
                 Integer scale = null;
@@ -243,6 +244,7 @@ public class LocalizedProcessor extends AbstractProcessor {
                     Object value = entry.getValue().getValue();
                     
                     switch (paramName) {
+                        case "name" -> name = (String) value;
                         case "length" -> length = (Integer) value;
                         case "precision" -> precision = (Integer) value;
                         case "scale" -> scale = (Integer) value;
@@ -252,7 +254,7 @@ public class LocalizedProcessor extends AbstractProcessor {
                     }
                 }
                 
-                return new InterfaceGenerator.ColumnInfo(length, precision, scale, nullable, unique, columnDefinition);
+                return new InterfaceGenerator.ColumnInfo(name, length, precision, scale, nullable, unique, columnDefinition);
             }
         }
         return InterfaceGenerator.ColumnInfo.empty();

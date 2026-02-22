@@ -284,4 +284,102 @@ class ConstraintPropagationTest {
                 """
             ));
     }
+    @Test
+    void shouldUseExplicitColumnNameOverridesSnakeCase() {
+        JavaFileObject entity = JavaFileObjects.forSourceString(
+                "com.example.TestEntity",
+                """
+                package com.example;
+                
+                import com.localizedjpa.annotations.Localized;
+                import jakarta.persistence.Entity;
+                import jakarta.persistence.Id;
+                import jakarta.persistence.Column;
+                
+                @Entity
+                public class TestEntity {
+                    @Id
+                    private Long id;
+                    
+                    @Localized
+                    @Column(name = "custom_address_field")
+                    private String addressLine1;
+                }
+                """
+        );
+
+        Compilation compilation = javac()
+                .withProcessors(new LocalizedProcessor())
+                .compile(entity);
+
+        assertThat(compilation).succeeded();
+
+        JavaFileObject expectedTranslation = JavaFileObjects.forSourceString(
+                "com.example.TestEntityTranslation",
+                """
+                package com.example;
+                
+                import com.fasterxml.jackson.annotation.JsonIgnore;
+                import com.localizedjpa.runtime.BaseTranslation;
+                import jakarta.persistence.Column;
+                import jakarta.persistence.Entity;
+                import jakarta.persistence.FetchType;
+                import jakarta.persistence.JoinColumn;
+                import jakarta.persistence.ManyToOne;
+                import jakarta.persistence.Table;
+                import java.lang.String;
+                import org.hibernate.annotations.BatchSize;
+                
+                /**
+                 * Generated translation entity for {@code TestEntity}.
+                 *
+                 * <p>This entity stores localized field values for each locale.
+                 * Table: {@code test_entity_translations}
+                 */
+                @Entity
+                @Table(
+                    name = "test_entity_translations"
+                )
+                @BatchSize(
+                    size = 25
+                )
+                public class TestEntityTranslation extends BaseTranslation {
+                    @JsonIgnore
+                    @ManyToOne(
+                        fetch = FetchType.LAZY
+                    )
+                    @JoinColumn(
+                        name = "test_entity_id",
+                        nullable = false
+                    )
+                    private TestEntity parent;
+                
+                    @Column(
+                        name = "custom_address_field"
+                    )
+                    private String addressLine1;
+                
+                    public TestEntity getParent() {
+                        return parent;
+                    }
+                
+                    public void setParent(TestEntity parent) {
+                        this.parent = parent;
+                    }
+                
+                    public String getAddressLine1() {
+                        return addressLine1;
+                    }
+                
+                    public void setAddressLine1(String addressLine1) {
+                        this.addressLine1 = addressLine1;
+                    }
+                }
+                """
+        );
+
+        assertThat(compilation)
+                .generatedSourceFile("com.example.TestEntityTranslation")
+                .hasSourceEquivalentTo(expectedTranslation);
+    }
 }
